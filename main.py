@@ -1,4 +1,6 @@
 import pygame
+from player import Player
+
 
 # Size of your game window in pixels.
 SCREEN_WIDTH = 1280
@@ -15,8 +17,8 @@ pygame.display.set_caption(title=TITLE)
 clock = pygame.time.Clock()
 running = True
 
-background_image = pygame.image.load("assets/Environment/background.png")
-# image = pygame.transform.scale(image, (44, 44))
+background_image = pygame.image.load("assets/environment/background.png")
+player = Player(400, 20)
 
 while running:
     # Poll for events
@@ -27,11 +29,11 @@ while running:
 
     # Fill the screen with a color to wipe away anything from last frame
     screen.fill(BACKGROUND_COLOR)
-    # pygame.draw.rect(screen, (255, 0, 0), (0, 0, SCREEN_WIDTH, SCREEN_HEIGHT), 2)
-
+    screen.blit(background_image, (0, 0))
     ######################## RENDER YOUR GAME HERE ########################
 
-    screen.blit(background_image,(0,0))
+    player.handle_input()
+    player.draw(screen)
 
     #######################################################################
 
