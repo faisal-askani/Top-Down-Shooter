@@ -10,8 +10,10 @@ class Player:
         self.player_size = (120, 120)
         self.player_idle = self.sprite_loader("assets/idle/idle", 6)
         self.player_walk = self.sprite_loader("assets/walk/walk", 9)
-        self.shotgun = pygame.transform.scale(pygame.image.load("assets/weapon/shotgun.png"),
-                                              (92, 29))
+        self.gun_sprite = pygame.transform.scale(pygame.image.load("assets/weapon/shotgun.png").convert_alpha(),
+                                                 (92, 29))
+        self.crosshair_sprite = pygame.transform.scale(pygame.image.load("assets/extras/crosshair.png").convert_alpha(),
+                                                       (32, 32))
         self.moving = False
         self.animation_count = 0
         self.frames_per_image = 2
@@ -41,15 +43,16 @@ class Player:
             self.moving = True
 
     def draw(self, screen):
-        self.player_sprite(screen)
-        self.gun_sprite(screen)
+        self.player(screen)
+        self.gun(screen)
+        self.cross_hair(screen)
 
     def animation_frame_counter(self, length):
         if self.animation_count + 1 >= length * self.frames_per_image:
             self.animation_count = 0
         self.animation_count += 1
 
-    def player_sprite(self, screen):
+    def player(self, screen):
         if self.moving:
             sprite_list = self.player_walk
         else:
@@ -61,7 +64,7 @@ class Player:
         current_sprite = sprite_list[frame_index]
         screen.blit(current_sprite, (self.x, self.y))
 
-    def gun_sprite(self, screen):
+    def gun(self, screen):
         mouse_x, mouse_y = pygame.mouse.get_pos()
         player_center_x = (self.x + self.player_size[0] // 2)
         player_center_y = (self.y + self.player_size[1] // 2) + 35
@@ -71,8 +74,8 @@ class Player:
         angle = math.degrees(math.atan2(-dy, dx))
 
         # Flip the gun if aiming to the left
-        gun = pygame.transform.flip(self.shotgun,
-                                    False, True) if dx < 0 else self.shotgun
+        gun = pygame.transform.flip(self.gun_sprite,
+                                    False, True) if dx < 0 else self.gun_sprite
 
         # Rotate the (possibly flipped) gun
         rotated_gun = pygame.transform.rotate(gun, angle)
@@ -80,3 +83,9 @@ class Player:
                                                 player_center_y))
 
         screen.blit(rotated_gun, gun_rect.topleft)
+
+    def cross_hair(self, screen):
+        mouse_x, mouse_y = pygame.mouse.get_pos()
+        crosshair_rect = self.crosshair_sprite.get_rect(
+            center=(mouse_x, mouse_y))
+        screen.blit(self.crosshair_sprite, crosshair_rect.topleft)

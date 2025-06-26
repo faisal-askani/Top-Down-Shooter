@@ -10,6 +10,7 @@ BACKGROUND_COLOR = (109, 105, 135)
 
 # Initialize pygame modules(display, sound, input)
 pygame.init()
+pygame.mouse.set_visible(False)  # Hide system cursor
 # Creates the game window with the specified width and height.
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 # Sets the title of the game window
