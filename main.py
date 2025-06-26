@@ -17,8 +17,9 @@ pygame.display.set_caption(title=TITLE)
 clock = pygame.time.Clock()
 running = True
 
-background_image = pygame.image.load("assets/environment/background.png")
-player = Player(640, 360)
+background_image = pygame.image.load("assets/environment/background2.png")
+
+player = Player(600, 250)
 
 while running:
     # Poll for events
@@ -34,14 +35,6 @@ while running:
 
     player.handle_input()
     player.draw(screen)
-
-
-
-    # Get mouse position
-    mouse_x, mouse_y = pygame.mouse.get_pos()
-
-    # Print to console
-    print("Mouse Position:", mouse_x, mouse_y)
 
     #######################################################################
 
