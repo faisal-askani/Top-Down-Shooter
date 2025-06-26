@@ -18,7 +18,7 @@ clock = pygame.time.Clock()
 running = True
 
 background_image = pygame.image.load("assets/environment/background.png")
-player = Player(400, 20)
+player = Player(640, 360)
 
 while running:
     # Poll for events
@@ -34,6 +34,14 @@ while running:
 
     player.handle_input()
     player.draw(screen)
+
+
+
+    # Get mouse position
+    mouse_x, mouse_y = pygame.mouse.get_pos()
+
+    # Print to console
+    print("Mouse Position:", mouse_x, mouse_y)
 
     #######################################################################
 
