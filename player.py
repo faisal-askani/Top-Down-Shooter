@@ -8,8 +8,8 @@ class Player:
         self.y = y
         self.player_speed = 5
         self.player_size = (120, 120)
-        self.player_idle = self.sprite_loader("assets/idle/idle", 6)
-        self.player_walk = self.sprite_loader("assets/walk/walk", 9)
+        self.player_idle = self._sprite_loader("assets/idle/idle", 6)
+        self.player_walk = self._sprite_loader("assets/walk/walk", 9)
         self.gun_sprite = pygame.transform.scale(pygame.image.load("assets/weapon/shotgun.png").convert_alpha(),
                                                  (92, 29))
         self.crosshair_sprite = pygame.transform.scale(pygame.image.load("assets/extras/crosshair.png").convert_alpha(),
@@ -18,7 +18,7 @@ class Player:
         self.animation_count = 0
         self.frames_per_image = 2
 
-    def sprite_loader(self, path, length):
+    def _sprite_loader(self, path, length):
         sprite = []
         for i in range(length):
             sprite.append(pygame.transform.scale(pygame.image.load(f"{path}_{i}.png").convert_alpha(),
@@ -43,28 +43,28 @@ class Player:
             self.moving = True
 
     def draw(self, screen):
-        self.player(screen)
-        self.gun(screen)
-        self.cross_hair(screen)
+        self._player(screen)
+        self._gun(screen)
+        self._cross_hair(screen)
 
-    def animation_frame_counter(self, length):
+    def _animation_frame_counter(self, length):
         if self.animation_count + 1 >= length * self.frames_per_image:
             self.animation_count = 0
         self.animation_count += 1
 
-    def player(self, screen):
+    def _player(self, screen):
         if self.moving:
             sprite_list = self.player_walk
         else:
             sprite_list = self.player_idle
 
         sprite_len = len(sprite_list)
-        self.animation_frame_counter(sprite_len)
+        self._animation_frame_counter(sprite_len)
         frame_index = self.animation_count // self.frames_per_image
         current_sprite = sprite_list[frame_index]
         screen.blit(current_sprite, (self.x, self.y))
 
-    def gun(self, screen):
+    def _gun(self, screen):
         mouse_x, mouse_y = pygame.mouse.get_pos()
         player_center_x = (self.x + self.player_size[0] // 2)
         player_center_y = (self.y + self.player_size[1] // 2) + 35
@@ -84,8 +84,11 @@ class Player:
 
         screen.blit(rotated_gun, gun_rect.topleft)
 
-    def cross_hair(self, screen):
+    def _cross_hair(self, screen):
         mouse_x, mouse_y = pygame.mouse.get_pos()
         crosshair_rect = self.crosshair_sprite.get_rect(
             center=(mouse_x, mouse_y))
         screen.blit(self.crosshair_sprite, crosshair_rect.topleft)
+
+    def get_position(self):
+        return (self.x, self.y)

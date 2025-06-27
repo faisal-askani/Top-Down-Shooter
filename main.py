@@ -1,5 +1,6 @@
 import pygame
 from player import Player
+from bullet import Bullet
 
 
 # Size of your game window in pixels.
@@ -18,13 +19,16 @@ pygame.display.set_caption(title=TITLE)
 clock = pygame.time.Clock()
 running = True
 
-background_image = pygame.image.load("assets/environment/background2.png")
+background_image = pygame.transform.scale(pygame.image.load("assets/environment/background2.png"),
+                                          (1920, 1080))
 
-player = Player(600, 250)
+player = Player(900, 400)
+bullet = Bullet(player.player_size, player.get_position)
 
 while running:
     # Poll for events
-    for event in pygame.event.get():
+    events = pygame.event.get()
+    for event in events:
         # pygame.QUIT event means the user clicked X to close your window
         if event.type == pygame.QUIT:
             running = False
@@ -36,6 +40,8 @@ while running:
 
     player.handle_input()
     player.draw(screen)
+    bullet.handle_input(events)
+    bullet.draw(screen)
 
     #######################################################################
 
