@@ -4,14 +4,14 @@ from bullet import Bullet
 
 
 # Size of your game window in pixels.
-SCREEN_WIDTH = 1280
-SCREEN_HEIGHT = 720
+SCREEN_WIDTH = 1920
+SCREEN_HEIGHT = 1080
 TITLE = "COMMANDO"
 BACKGROUND_COLOR = (109, 105, 135)
 
 # Initialize pygame modules(display, sound, input)
 pygame.init()
-pygame.mouse.set_visible(False)  # Hide system cursor
+# pygame.mouse.set_visible(False)  # Hide system cursor
 # Creates the game window with the specified width and height.
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 # Sets the title of the game window
@@ -23,7 +23,7 @@ background_image = pygame.transform.scale(pygame.image.load("assets/environment/
                                           (1920, 1080))
 
 player = Player(900, 400)
-bullet = Bullet(player.player_size, player.get_position)
+bullet = Bullet(player.player_size, player.get_center, player.get_radian)
 
 while running:
     # Poll for events

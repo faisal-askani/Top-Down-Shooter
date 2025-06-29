@@ -1,0 +1,62 @@
+############################################################################
+
+        print("angle: ", angle)
+        angle_rad = math.atan2(-dy, dx)
+        print("radian: ", angle_rad)
+        print("Cos: ", math.cos(angle_rad))
+
+############################################################################
+
+   def debug_player(self, screen):
+        # 1. Draw a rectangle around the player
+        player_rect = pygame.Rect(
+            self.x, self.y, self.player_size[0], self.player_size[1])
+        # Green rectangle with 2px border
+        pygame.draw.rect(screen, (0, 255, 0), player_rect, 2)
+
+        # 2. Draw cross lines through the center
+        center_x = self.x + self.player_size[0] // 2
+        center_y = self.y + self.player_size[1] // 2
+
+        # Horizontal line
+        pygame.draw.line(screen, (255, 255, 0), (self.x, center_y),
+                         (self.x + self.player_size[0], center_y), 1)
+
+        # Vertical line
+        pygame.draw.line(screen, (255, 255, 0), (center_x, self.y),
+                         (center_x, self.y + self.player_size[1]), 1)
+
+############################################################################
+
+    def debug_gun(self, screen):
+        mouse_x, mouse_y = pygame.mouse.get_pos()
+        player_center_x = self.x + self.player_size[0] // 2
+        player_center_y = self.y + self.player_size[1] // 2 + 35
+
+        dx = mouse_x - player_center_x
+        dy = mouse_y - player_center_y
+        angle = math.degrees(math.atan2(-dy, dx))
+
+        # Flip the gun if aiming to the left
+        gun = pygame.transform.flip(
+            self.gun_sprite, False, True) if dx < 0 else self.gun_sprite
+        rotated_gun = pygame.transform.rotate(gun, angle)
+        gun_rect = rotated_gun.get_rect(
+            center=(player_center_x, player_center_y))
+
+        # 🔲 Draw bounding box around rotated gun
+        pygame.draw.rect(screen, (255, 0, 255), gun_rect,
+                         2)  # Magenta rectangle
+
+        # 🎯 Draw pivot point (center of rotation)
+        pygame.draw.circle(screen, (0, 255, 255),
+                           (player_center_x, player_center_y), 4)  # Cyan dot
+
+        # ➤ Draw direction line from gun center toward mouse
+        direction_length = 80
+        angle_rad = math.atan2(-dy, dx)
+        end_x = player_center_x + math.cos(angle_rad) * direction_length
+        end_y = player_center_y - math.sin(angle_rad) * direction_length
+
+        pygame.draw.line(screen, (255, 0, 0), (player_center_x,
+                         player_center_y), (end_x, end_y), 2)  # Red direction

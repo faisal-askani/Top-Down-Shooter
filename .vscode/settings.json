@@ -1,0 +1,15 @@
+{
+    "editor.tokenColorCustomizations": {
+        "textMateRules": [
+            {
+                "scope": [
+                    "variable.other.readwrite",
+                    "variable.other"
+                ],
+                "settings": {
+                    "foreground": "#d1d1d1"
+                }
+            }
+        ]
+    }
+}

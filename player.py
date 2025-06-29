@@ -8,12 +8,14 @@ class Player:
         self.y = y
         self.player_speed = 5
         self.player_size = (120, 120)
+        self.player_center = None
+        self.gun_radian = None
         self.player_idle = self._sprite_loader("assets/idle/idle", 6)
         self.player_walk = self._sprite_loader("assets/walk/walk", 9)
         self.gun_sprite = pygame.transform.scale(pygame.image.load("assets/weapon/shotgun.png").convert_alpha(),
                                                  (92, 29))
         self.crosshair_sprite = pygame.transform.scale(pygame.image.load("assets/extras/crosshair.png").convert_alpha(),
-                                                       (32, 32))
+                                                       (100, 100))
         self.moving = False
         self.animation_count = 0
         self.frames_per_image = 2
@@ -68,10 +70,12 @@ class Player:
         mouse_x, mouse_y = pygame.mouse.get_pos()
         player_center_x = (self.x + self.player_size[0] // 2)
         player_center_y = (self.y + self.player_size[1] // 2) + 35
+        self.player_center = (player_center_x, player_center_y)
 
         dx = mouse_x - player_center_x
         dy = mouse_y - player_center_y
-        angle = math.degrees(math.atan2(-dy, dx))
+        self.gun_radian = math.atan2(-dy, dx)
+        angle = math.degrees(self.gun_radian)
 
         # Flip the gun if aiming to the left
         gun = pygame.transform.flip(self.gun_sprite,
@@ -90,5 +94,8 @@ class Player:
             center=(mouse_x, mouse_y))
         screen.blit(self.crosshair_sprite, crosshair_rect.topleft)
 
-    def get_position(self):
-        return (self.x, self.y)
+    def get_center(self):
+        return self.player_center
+
+    def get_radian(self):
+        return self.gun_radian

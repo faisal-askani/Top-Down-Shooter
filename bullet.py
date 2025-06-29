@@ -3,9 +3,11 @@ import math
 
 
 class Bullet:
-    def __init__(self, player_size, get_player_position):
-        self._get_player_position = get_player_position
+    def __init__(self, player_size, get_player_center, get_gun_radian):
+        self._get_player_center = get_player_center
+        self._get_gun_radian = get_gun_radian
         self.player_size = player_size
+        self.nozzle_offset_distance = 40
         self.bullet_speed = 12
         self.bullets = []
         self.bullet_sprite = pygame.transform.scale(pygame.image.load("assets/extras/bullet.png").convert_alpha(),
@@ -21,34 +23,34 @@ class Bullet:
 
     def _bullet_calculation(self):
         mouse_x, mouse_y = pygame.mouse.get_pos()
-        x, y = self._get_player_position()
-        player_center_x = x + self.player_size[0] // 2
-        player_center_y = y + self.player_size[1] // 2
-        diretion_x = mouse_x - player_center_x
-        direction_y = mouse_y - player_center_y
-        distance = math.hypot(diretion_x, direction_y)
+        gun_pivot_x, gun_pivot_y = self._get_player_center()
+        angle_rad = self._get_gun_radian()
+        gun_facing_x = math.cos(angle_rad)
+        gun_facing_y = math.sin(angle_rad)
+        bullet_start_x = gun_pivot_x + gun_facing_x * self.nozzle_offset_distance
+        bullet_start_y = gun_pivot_y - gun_facing_y * self.nozzle_offset_distance
+        bullet_dir_x = mouse_x - bullet_start_x
+        bullet_dir_y = mouse_y - bullet_start_y
 
+        distance = math.hypot(bullet_dir_x, bullet_dir_y)
         if distance == 0:
-            return  # Prevent divide by zero
+            return
 
-        diretion_x /= distance
-        direction_y /= distance
-
-        bullet = {
-            "start_x": player_center_x,
-            "start_y": player_center_y,
-            "dir_x": diretion_x,
-            "dir_y": direction_y
-        }
-        self.bullets.append(bullet)
+        bullet_dir_x /= distance
+        bullet_dir_y /= distance
+        self.bullets.append({"start_x": bullet_start_x,
+                             "start_y": bullet_start_y,
+                             "dir_x": bullet_dir_x,
+                             "dir_y": bullet_dir_y
+                             })
 
     def _update_bullet_position(self, screen):
         for bullet in self.bullets[:]:
             bullet["start_x"] += bullet["dir_x"] * self.bullet_speed
             bullet["start_y"] += bullet["dir_y"] * self.bullet_speed
-            screen.blit(self.bullet_sprite,
-                        (bullet["start_x"], bullet["start_y"]))
+            bullet_rect = self.bullet_sprite.get_rect(center=(int(bullet["start_x"]),
+                                                              int(bullet["start_y"])))
+            screen.blit(self.bullet_sprite, bullet_rect)
 
-            # Remove bullets that go off screen
-            if (bullet["start_x"] < 0 or bullet["start_x"] > 1280 or bullet["start_y"] < 0 or bullet["start_y"] > 720):
+            if (bullet["start_x"] < 0 or bullet["start_x"] > 1920 or bullet["start_y"] < 0 or bullet["start_y"] > 1080):
                 self.bullets.remove(bullet)
