@@ -7,25 +7,33 @@ class Player:
         self.x = x
         self.y = y
         self.player_speed = 5
-        self.player_size = (120, 120)
+        self.player_size = (150, 150)
         self.player_center = None
         self.gun_radian = None
-        self.player_idle = self._sprite_loader("assets/idle/idle", 6)
-        self.player_walk = self._sprite_loader("assets/walk/walk", 9)
-        self.gun_sprite = pygame.transform.scale(pygame.image.load("assets/weapon/shotgun.png").convert_alpha(),
-                                                 (92, 29))
-        self.crosshair_sprite = pygame.transform.scale(pygame.image.load("assets/extras/crosshair.png").convert_alpha(),
-                                                       (100, 100))
+        self.player_idle = self._sprite_loader("assets/player/idle/idle", 6)
+        self.player_walk = self._sprite_loader("assets/player/walk//walk", 9)
+        self.gun_sprite = self._sprite_loader(path="assets/weapon/rifle.png",
+                                              size=(92, 46))
+        self.crosshair_sprite = self._sprite_loader(path="assets/extras/crosshair.png",
+                                                    size=(100, 100))
         self.moving = False
         self.animation_count = 0
         self.frames_per_image = 2
 
-    def _sprite_loader(self, path, length):
-        sprite = []
-        for i in range(length):
-            sprite.append(pygame.transform.scale(pygame.image.load(f"{path}_{i}.png").convert_alpha(),
-                                                 self.player_size))
-        return sprite
+    def _sprite_loader(self, path, length=1, size=None):
+        sprites = []
+        if length == 1:
+            image = pygame.image.load(path).convert_alpha()
+            if size:
+                image = pygame.transform.scale(image, size)
+            sprites.append(image)
+        else:
+            for i in range(length):
+                image = pygame.image.load(f"{path}_{i}.png").convert_alpha()
+                image = pygame.transform.scale(image, self.player_size)
+                sprites.append(image)
+
+        return sprites if length > 1 else sprites[0]
 
     def handle_input(self):
         keys = pygame.key.get_pressed()
@@ -99,3 +107,4 @@ class Player:
 
     def get_radian(self):
         return self.gun_radian
+    

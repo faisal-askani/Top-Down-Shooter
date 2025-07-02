@@ -60,3 +60,18 @@
 
         pygame.draw.line(screen, (255, 0, 0), (player_center_x,
                          player_center_y), (end_x, end_y), 2)  # Red direction
+
+###############################################################################
+
+    def debug_muzzle_flash(self, screen, flash_rect):
+        pygame.draw.rect(screen, (255, 0, 0), flash_rect, 2)
+
+###############################################################################
+
+    def debug_enemy(self, screen):
+        pygame.draw.rect(screen, (255, 0, 0), self.enemy_rect, 2)
+
+###############################################################################
+
+    def debug_bullets(self, screen, bullet_rect):
+        pygame.draw.rect(screen, (0, 255, 0), bullet_rect, 2)
