@@ -98,8 +98,10 @@ class Bullet:
             screen.blit(self.bullet_sprite, bullet_draw_rect)
             self.debug_bullets(screen, bullet_collision)
 
-            if (bullet["start_x"] < 0 or bullet["start_x"] > 1920 or
-                    bullet["start_y"] < 0 or bullet["start_y"] > 1080):
+            if (bullet["start_x"] < 0 or
+                bullet["start_x"] > 1920 or
+                bullet["start_y"] < 0 or
+                    bullet["start_y"] > 1080):
                 self.bullets.remove(bullet)
 
     def _on_body_entered(self, bullet_rect, bullet):
