@@ -1,8 +1,9 @@
 import pygame
 from player import Player
-from enemy import Enemy
+from big_demon import BigDemon
 from suicide_bomber import Suicide_Bomber
 from bullet import Bullet
+from demon_fire import DemonFire
 
 # Size of your game window in pixels.
 SCREEN_WIDTH = 1920
@@ -29,13 +30,21 @@ background_image = pygame.transform.scale(pygame.image.load("assets/environment/
                                           (1920, 1080))
 
 player = Player(900, 400)
-enemy = Suicide_Bomber(100, 100,
-                       player.get_center,
-                       player.on_player_body_entered)
+# enemy = Suicide_Bomber(100, 100,
+#                        player.get_center,
+#                        player.on_player_body_entered)
+big_demon = BigDemon(100, 100,
+                     player.get_center,
+                     player.on_player_body_entered)
 bullet = Bullet(player.get_center,
                 player.get_radian,
-                enemy.get_enemy_collision_rect,
-                enemy.is_bullet_hit)
+                big_demon.get_enemy_collision_rect,
+                big_demon.is_bullet_hit)
+demon_fire = DemonFire(
+    get_enemy_center=big_demon.get_center,
+    get_player_collision=player.get_collision_rect,  # this must be updated each frame
+    on_player_body_entered=player.on_player_body_entered
+)
 
 while running:
     # Poll for events
@@ -54,7 +63,8 @@ while running:
     player.draw(screen)
     bullet.handle_input(events, screen)
     bullet.draw(screen)
-    enemy.draw(screen)
+    big_demon.draw(screen)
+    demon_fire.update(screen)
 
     #######################################################################
 

@@ -2,7 +2,7 @@ import pygame
 import math
 
 
-class Enemy:
+class BigDemon:
     def __init__(self, x, y, get_player_position, on_player_body_entered):
         self.x = x
         self.y = y
@@ -116,6 +116,9 @@ class Enemy:
 
     def get_enemy_collision_rect(self):
         return self.enemy_rect
+
+    def get_center(self):
+        return (self.x, self.y)
 
     def debug_enemy(self, screen, rect):
         pygame.draw.rect(screen, (255, 0, 0), rect, 2)

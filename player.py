@@ -195,5 +195,8 @@ class Player:
     def get_radian(self):
         return self.gun_radian
 
+    def get_collision_rect(self):
+        return self.player_collision
+
     def debug_player(self, screen, rect):
         pygame.draw.rect(screen, (255, 0, 255), rect, 2)
