@@ -20,7 +20,7 @@ class Player:
                                                size=self.player_size)
         self.player_hurt = self._sprite_loader(path="assets/player/hurt/hurt_0.png",
                                                size=self.player_size)
-        self.player_death = self._sprite_loader(path="assets/player/death/death",
+        self.player_death = self._sprite_loader(path="assets/death/death",
                                                 length=5,
                                                 size=self.player_size)
         self.gun_sprite = self._sprite_loader(path="assets/weapon/rifle.png",
@@ -174,8 +174,10 @@ class Player:
             center=(mouse_x, mouse_y))
         screen.blit(self.crosshair_sprite, crosshair_rect.topleft)
 
-    def on_player_body_entered(self, enemy_body):
+    def on_player_body_entered(self, enemy_body, bomber=False):
         if self.player_collision.colliderect(enemy_body):
+            if bomber:
+                self.hit_count = 10
             self._handle_player_hit()
 
     def _handle_player_hit(self):

@@ -1,6 +1,7 @@
 import pygame
 from player import Player
 from enemy import Enemy
+from suicide_bomber import Suicide_Bomber
 from bullet import Bullet
 
 # Size of your game window in pixels.
@@ -28,9 +29,9 @@ background_image = pygame.transform.scale(pygame.image.load("assets/environment/
                                           (1920, 1080))
 
 player = Player(900, 400)
-enemy = Enemy(100, 100,
-              player.get_center,
-              player.on_player_body_entered)
+enemy = Suicide_Bomber(100, 100,
+                       player.get_center,
+                       player.on_player_body_entered)
 bullet = Bullet(player.get_center,
                 player.get_radian,
                 enemy.get_enemy_collision_rect,
