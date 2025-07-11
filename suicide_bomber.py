@@ -9,7 +9,7 @@ class Suicide_Bomber:
         self._on_player_body_entered = on_player_body_entered
         self._get_player_position = get_player_position
         self.flip_dir = 0
-        self.enemy_speed = 1
+        self.enemy_speed = 3
         self.enemy_size = (176, 198)
         self.enemy_walk = self._sprite_loader(path="assets/enemy/suicide_bomber/walk/walk",
                                               length=4,
@@ -21,10 +21,13 @@ class Suicide_Bomber:
                                                size=(128, 128))
         self.enemy_boom = self._sprite_loader(path="assets/enemy/suicide_bomber/boom/boom",
                                               length=4,
-                                              size=(300, 300))
+                                              size=(400, 400))
+        self.explosion_sound = pygame.mixer.Sound("assets/audio/explosion.mp3")
+        self.hurt_sound = pygame.mixer.Sound("assets/audio/bomber_hurt_sound.wav")
         self.moving = True
         self.death = False
         self.hurt = False
+        self.explosion_played = False
         self.death_animation_done = False
         self.animation_count = 0
         self.frames_per_image = 5
@@ -62,6 +65,7 @@ class Suicide_Bomber:
             if self.moving:
                 self._enemy_walk_anim(screen, self.enemy_walk)
             elif self.hurt:
+                self.hurt_sound.play()
                 self._enemy_hit_anim(screen, self.enemy_hurt)
 
         if self.hit_count >= 3 and not self.death_animation_done:
@@ -70,7 +74,7 @@ class Suicide_Bomber:
         if self.distance <= 400 and not self.death_animation_done:
             self._enemy_blast_anim(screen, self.enemy_boom)
 
-        self._on_player_body_entered(self.enemy_rect, True)
+        # self._on_player_body_entered(self.enemy_rect, True)
 
     def _blit_enemy_anim(self, screen, sprite_list, blast=False):
         sprite_len = len(sprite_list)
@@ -81,7 +85,7 @@ class Suicide_Bomber:
         rect = current_sprite.get_rect(center=(self.x, self.y))
 
         if blast:
-            self.enemy_rect = rect.copy().inflate(600, 600)  # Bigger collision for blast
+            self.enemy_rect = rect.copy().inflate(450, 450)  # Bigger collision for blast
         else:
             self.enemy_rect = rect  # Normal collision for enemy
 
@@ -97,7 +101,7 @@ class Suicide_Bomber:
         self._blit_enemy_anim(screen, sprite_list)
 
     def _enemy_death_anim(self, screen, sprite_list):
-        print("enemy death")
+        print("suicide bomber death")
         self._blit_enemy_anim(screen, sprite_list)
         self.death = True
         self.moving = False
@@ -113,6 +117,10 @@ class Suicide_Bomber:
         self.hurt = False
 
     def _enemy_blast_anim(self, screen, sprite_list):
+        if not self.explosion_played:
+            self.explosion_sound.play()
+            self.explosion_played = True  # Mark as played
+
         print(f"distance: {self.distance}", ", Blast!!!!")
         self.frames_per_image = 10
         self._blit_enemy_anim(screen, sprite_list, blast=True)
@@ -139,12 +147,11 @@ class Suicide_Bomber:
         self.x += enemy_dir_x * self.enemy_speed
         self.y += enemy_dir_y * self.enemy_speed
 
-    def is_bullet_hit(self, hit):
+    def is_bullet_hit(self):
         self.moving = False
-        self.hurt = hit
+        self.hurt = True
         self.hit_count += 1
-        print("count: ", self.hit_count)
-        print("Confirm Hit: ", hit)
+        print(f"Suicide Bomber hit! Current HP: {self.hit_count}")
 
     def get_enemy_collision_rect(self):
         return self.enemy_rect

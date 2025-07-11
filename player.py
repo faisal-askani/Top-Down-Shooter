@@ -27,6 +27,7 @@ class Player:
                                               size=(92, 46))
         self.crosshair_sprite = self._sprite_loader(path="assets/extras/crosshair.png",
                                                     size=(100, 100))
+        self.hurt_sound = pygame.mixer.Sound("assets/audio/player_hurt_sound.wav")
         self.idle = True
         self.moving = False
         self.hurt = False
@@ -90,6 +91,7 @@ class Player:
             self.frames_per_image = 6
             self._player_death_anim(screen, self.player_death)
         elif self.hurt:
+            self.hurt_sound.play()
             self._player_hurt_anim(screen, self.player_hurt)
         elif self.moving:
             self._player_walk_anim(screen, self.player_walk)
@@ -123,7 +125,7 @@ class Player:
         frame_index = self.animation_count // self.frames_per_image
         print('frame: ', frame_index, " len of sprite: ", len(sprite_list))
         if frame_index >= len(sprite_list) - 1:
-            print(self.death_animation_done, "hit animatiopn done")
+            print(self.death_animation_done, "hit animation done")
             self.death_animation_done = True
 
     def _player_hurt_anim(self, screen, sprite):
@@ -174,11 +176,10 @@ class Player:
             center=(mouse_x, mouse_y))
         screen.blit(self.crosshair_sprite, crosshair_rect.topleft)
 
-    def on_player_body_entered(self, enemy_body, bomber=False):
-        if self.player_collision.colliderect(enemy_body):
-            if bomber:
-                self.hit_count = 10
-            self._handle_player_hit()
+    def on_player_body_entered(self, bomber=False):
+        if bomber:
+            self.hit_count = 10
+        self._handle_player_hit()
 
     def _handle_player_hit(self):
         current_time = pygame.time.get_ticks()
@@ -187,7 +188,7 @@ class Player:
             self.hurt = True
             self.hit_count += 1
             self.last_hit_time = current_time
-            print("Player hurt! Hit:", self.hit_count)
+            print(f"Player hit! Current HP: {self.hit_count}")
 
     def get_center(self):
         return self.player_center

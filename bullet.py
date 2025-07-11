@@ -3,27 +3,34 @@ import math
 
 
 class Bullet:
-    def __init__(self, get_player_center, get_gun_radian, get_enemy_collision, is_bullet_hit):
+    def __init__(self, get_player_center, get_gun_radian):
         self._get_player_center = get_player_center
         self._get_gun_radian = get_gun_radian
-        self._get_enemy_collision = get_enemy_collision
-        self.is_bullet_hit = is_bullet_hit
         self.nozzle_offset_distance = 90
-        self.bullet_speed = 1
+        self.bullet_speed = 10
         self.bullets = []
         self.bullet_sprite = pygame.transform.scale(pygame.image.load("assets/extras/bullet.png").convert_alpha(),
                                                     (52, 52))
         self.nozzle_flash = pygame.transform.scale(pygame.image.load("assets/extras/muzzle.png").convert_alpha(),
                                                    (52, 52))
+        self.gun_sound = pygame.mixer.Sound(
+            "assets/audio/20 Gauge/WAV/20_Gauge_Single_Isolated.wav")
 
-    def handle_input(self, events, screen):
-        for event in events:
-            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+        self.last_shot_time = 0  # To control firing rate
+        self.fire_rate_delay = 150  # milliseconds between shots
+
+    def handle_input(self, screen):
+        mouse_buttons = pygame.mouse.get_pressed()
+        if mouse_buttons[0]:  # [0] is the left mouse button
+            current_time = pygame.time.get_ticks()
+            if current_time - self.last_shot_time > self.fire_rate_delay:
+                self.gun_sound.play()
                 self._nozzle_flash_calculation(screen)
                 self._bullet_calculation()
+                self.last_shot_time = current_time
 
-    def draw(self, screen):
-        self._update_bullet_position(screen)
+    def draw(self, screen, all_enemies):
+        self._update_bullet_position(screen, all_enemies)
 
     def _nozzle_flash_calculation(self, screen):
         mouse_x, _ = pygame.mouse.get_pos()
@@ -50,7 +57,6 @@ class Bullet:
 
         flash_rect = rotated_flash.get_rect(center=(int(flash_center_x),
                                                     int(flash_center_y) - 3))
-
         screen.blit(rotated_flash, flash_rect.topleft)
 
     def _bullet_calculation(self):
@@ -77,7 +83,7 @@ class Bullet:
                              "has_hit": False
                              })
 
-    def _update_bullet_position(self, screen):
+    def _update_bullet_position(self, screen, all_enemies):
         for bullet in self.bullets[:]:
             if bullet["has_hit"]:
                 self.bullets.remove(bullet)
@@ -88,15 +94,18 @@ class Bullet:
 
             collision_size = 20
             bullet_center = (int(bullet["start_x"]), int(bullet["start_y"]))
-            bullet_collision = pygame.Rect(
+            bullet_collision_rect = pygame.Rect(
                 0, 0, collision_size, collision_size)
-            bullet_collision.center = bullet_center
+            bullet_collision_rect.center = bullet_center
+
+            self._check_collision(bullet, all_enemies, bullet_collision_rect)
+
             bullet_draw_rect = self.bullet_sprite.get_rect(
                 center=bullet_center)
 
-            self._on_body_entered(bullet_collision, bullet)
+            # self._on_body_entered(bullet_collision, bullet)
             screen.blit(self.bullet_sprite, bullet_draw_rect)
-            self.debug_bullets(screen, bullet_collision)
+            self.debug_bullets(screen, bullet_collision_rect)
 
             if (bullet["start_x"] < 0 or
                 bullet["start_x"] > 1920 or
@@ -104,10 +113,13 @@ class Bullet:
                     bullet["start_y"] > 1080):
                 self.bullets.remove(bullet)
 
-    def _on_body_entered(self, bullet_rect, bullet):
-        if bullet_rect.colliderect(self._get_enemy_collision()):
-            bullet["has_hit"] = True
-            self.is_bullet_hit(True)
+    def _check_collision(self, bullet, all_enemies, bullet_collision_rect):
+        for enemy in all_enemies:
+            enemy_rect = enemy.get_enemy_collision_rect()
+            if enemy_rect and bullet_collision_rect.colliderect(enemy_rect):
+                bullet["has_hit"] = True  # Mark bullet for removal
+                enemy.is_bullet_hit()  # Call enemy's hit method (Point 2)
+                break  # Bullet hit one enemy, so stop checking and move to next bullet
 
     def debug_bullets(self, screen, bullet_rect):
         pygame.draw.rect(screen, (0, 255, 0), bullet_rect, 2)

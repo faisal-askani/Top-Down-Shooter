@@ -3,20 +3,20 @@ import math
 
 
 class DemonFire:
-    def __init__(self, get_enemy_center, get_player_collision, on_player_body_entered):
-        self._get_enemy_center = get_enemy_center
-        self._get_player_collision = get_player_collision
-        self._on_player_body_entered = on_player_body_entered
+    def __init__(self, start_x, start_y, dir_x, dir_y):
+        self.x = start_x
+        self.y = start_y
+        self.dir_x = dir_x
+        self.dir_y = dir_y
 
-        self.bullet_speed = 2
-        self.bullets = []
+        self.fire_speed = 3
+        self.has_hit = False
 
         # Load bullet animation frames
-        self.bullet_frames = self._sprite_loader(
+        self.fire_sprite = self._sprite_loader(
             "assets/extras/demon_fire/fire", length=4, size=(52, 52))
-
-        self.last_shot_time = 0
-        self.shoot_interval = 5000  # milliseconds (5 seconds)
+        self.frame_index = 0
+        self.frame_counter = 0
 
     def _sprite_loader(self, path, length=1, size=None):
         sprites = []
@@ -28,72 +28,36 @@ class DemonFire:
         return sprites
 
     def update(self, screen):
-        self._auto_fire()
-        self._update_bullets(screen)
-
-    def _auto_fire(self):
-        current_time = pygame.time.get_ticks()
-        if current_time - self.last_shot_time >= self.shoot_interval:
-            self._fire_bullet()
-            self.last_shot_time = current_time
-
-    def _fire_bullet(self):
-        enemy_x, enemy_y = self._get_enemy_center()
-        player_rect = self._get_player_collision()
-        player_x, player_y = player_rect.center
-
-        dir_x = player_x - enemy_x
-        dir_y = player_y - enemy_y
-        distance = math.hypot(dir_x, dir_y)
-        if distance == 0:
+        if self.has_hit:
             return
-        dir_x /= distance
-        dir_y /= distance
+        self._update_fire(screen)
 
-        self.bullets.append({
-            "x": enemy_x,
-            "y": enemy_y,
-            "dir_x": dir_x,
-            "dir_y": dir_y,
-            "has_hit": False,
-            "frame_index": 0,
-            "frame_counter": 0
-        })
+    def _update_fire(self, screen):
+        # Move bullet
+        self.x += self.dir_x * self.fire_speed
+        self.y += self.dir_y * self.fire_speed
 
-    def _update_bullets(self, screen):
-        player_rect = self._get_player_collision()
+        # Update animation frame
+        self.frame_counter += 1
+        if self.frame_counter >= 5:  # Adjust frame rate as needed
+            self.frame_counter = 0
+            self.frame_index = (self.frame_index + 1) % len(self.fire_sprite)
 
-        for bullet in self.bullets[:]:
-            if bullet["has_hit"]:
-                self.bullets.remove(bullet)
-                continue
+        # Calculate rotation angle
+        angle = math.degrees(math.atan2(-self.dir_y, self.dir_x))
+        rotated_sprite = pygame.transform.rotate(self.fire_sprite[self.frame_index],
+                                                 angle)
+        fire_rect = rotated_sprite.get_rect(center=(int(self.x),
+                                                    int(self.y)))
+        screen.blit(rotated_sprite, fire_rect.topleft)
+        self.debug_bullet(screen, fire_rect)  # For debugging collision box
 
-            # Move bullet
-            bullet["x"] += bullet["dir_x"] * self.bullet_speed
-            bullet["y"] += bullet["dir_y"] * self.bullet_speed
+    # Method to get its own collision rect for checks in main.py
+    def get_collision_rect(self):
+        # A simple rect for collision, assuming the sprite's current size is sufficient
+        # Offset to center the collision rect on the bullet's x,y
+        return pygame.Rect(0, 0, 52, 52).copy().move(self.x - 26, self.y - 26)
 
-            # Update animation frame
-            bullet["frame_counter"] += 1
-            if bullet["frame_counter"] >= 5:
-                bullet["frame_counter"] = 0
-                bullet["frame_index"] = (
-                    bullet["frame_index"] + 1) % len(self.bullet_frames)
-
-            # Calculate rotation angle
-            angle = math.degrees(math.atan2(-bullet["dir_y"], bullet["dir_x"]))
-            rotated_sprite = pygame.transform.rotate(
-                self.bullet_frames[bullet["frame_index"]], angle)
-
-            bullet_rect = rotated_sprite.get_rect(
-                center=(int(bullet["x"]), int(bullet["y"])))
-            screen.blit(rotated_sprite, bullet_rect.topleft)
-
-            # Check collision with player
-            if bullet_rect.colliderect(player_rect):
-                bullet["has_hit"] = True
-                self._on_player_body_entered(player_rect)
-
-            # Remove if off-screen
-            if (bullet["x"] < 0 or bullet["x"] > 1920 or
-                    bullet["y"] < 0 or bullet["y"] > 1080):
-                self.bullets.remove(bullet)
+    def debug_bullet(self, screen, rect):
+        # Yellow border for demon fire
+        pygame.draw.rect(screen, (255, 255, 0), rect, 1)
