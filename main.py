@@ -4,12 +4,13 @@ from player import Player
 from bullet import Bullet
 from big_demon import BigDemon
 from suicide_bomber import Suicide_Bomber
+from orc import Orc
 
 
 # Size of your game window in pixels.
 SCREEN_WIDTH = 1920
 SCREEN_HEIGHT = 1080
-TITLE = "COMMANDO"
+TITLE = "Shapatar Londa"
 BACKGROUND_COLOR = (109, 105, 135)
 
 # Initialize pygame modules(display, sound, input)
@@ -27,8 +28,9 @@ pygame.mixer.music.load("assets/audio/retro_future.mp3")
 pygame.mixer.music.set_volume(0.2)  # Volume: 0.0 to 1.0
 pygame.mixer.music.play(-1)  # -1 = loop forever
 # ------------------------------------------------------------------------------------------------
-num_big_demons = 1  # Number of Demons
-num_suicide_bombers = 1  # Number of Bombers
+num_big_demons = 4  # Number of Demons
+num_suicide_bombers = 4  # Number of Bombers
+num_orc = 4
 spawn_margin = 300  # How far outside the screen enemies can spawn
 
 
@@ -71,8 +73,11 @@ all_enemies = []
 # List to hold all active DemonFire projectiles
 demon_fire_projectiles = []
 player = Player(900, 400)
-big_demons = spawn_enemies(BigDemon, 2)
-suicide_bombers = spawn_enemies(Suicide_Bomber, 2)
+
+
+orcs = spawn_enemies(Orc, num_orc)
+big_demons = spawn_enemies(BigDemon, num_big_demons)
+suicide_bombers = spawn_enemies(Suicide_Bomber, num_suicide_bombers)
 
 # Player's bullet no longer takes specific enemy functions, but expects a list of enemies later
 bullet = Bullet(player.get_center, player.get_radian)
@@ -93,7 +98,25 @@ def clear_and_append_enemies():
     for bomber in suicide_bombers:
         if not bomber.death_animation_done:  # Only add if not dead
             all_enemies.append(bomber)
+    for orc in orcs:
+        if not orc.death_animation_done:  # Only add if not dead
+            all_enemies.append(orc)
 
+
+# ---------------------- Update and draw Orcs ---------------------
+def update_and_draw_orc():
+    global first_wave, second_wave, third_wave, final_wave
+    for orc in orcs[:]:  # Iterate over a slice
+        orc.draw(screen)
+        if orc.enemy_rect and orc.enemy_rect.colliderect(player.get_collision_rect()):
+            player.on_player_body_entered()
+        # Remove dead orc
+        if orc.death_animation_done:
+            orcs.remove(orc)
+    if not orcs:
+        first_wave = False
+        second_wave = True
+    print("second wave: ", second_wave)
 
 # ------ Update and draw BigDemons and Independent DemonFire ------
 def update_and_draw_demon_and_fire():
@@ -117,10 +140,12 @@ def update_and_draw_demon_and_fire():
             big_demons.remove(demon)
 
     if not big_demons:
-        first_wave = False
-        second_wave = True
-    print("second wave: ", second_wave)
+        second_wave = False
+        third_wave = True
+    print("third wave: ", third_wave)
 
+
+def demon_fire_generation():
     # DemonFire: Iterate over a copy for safe removal
     for fire_bullet in demon_fire_projectiles[:]:
         fire_bullet.update(screen)
@@ -143,12 +168,9 @@ def update_and_draw_demon_and_fire():
 def update_and_draw_suicide_bomber():
     for bomber in suicide_bombers[:]:  # Iterate over a slice
         bomber.draw(screen)
-
         if bomber.enemy_rect and bomber.enemy_rect.colliderect(player.get_collision_rect()):
             player.on_player_body_entered(bomber=True)
-            pass
-
-        # Remove dead bombers (Point 2)
+        # Remove dead bombers
         if bomber.death_animation_done:
             suicide_bombers.remove(bomber)
 
@@ -176,12 +198,17 @@ while running:
     bullet.handle_input(screen)
     bullet.draw(screen, all_enemies)
 
-    # ------ Update and draw BigDemons and Independent DemonFire ------
+    # --------------------- Update and draw Ocrs ----------------------
     if first_wave:
+        update_and_draw_orc()
+
+    # ------ Update and draw BigDemons and Independent DemonFire ------
+    if second_wave:
         update_and_draw_demon_and_fire()
+    demon_fire_generation()
 
     # ----------------- Update and draw SuicideBombers ----------------
-    if second_wave:
+    if third_wave:
         update_and_draw_suicide_bomber()
 
     # -----------------------------------------------------------------
