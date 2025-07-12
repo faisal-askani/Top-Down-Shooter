@@ -111,7 +111,7 @@ class Player:
         player_rect = current_sprite.get_rect(center=player_center)
 
         screen.blit(current_sprite, player_rect)
-        self.debug_player(screen, self.player_collision)
+        # self.debug_player(screen, self.player_collision)
 
     def _player_walk_anim(self, screen, sprite_list):
         self._blit_player_anim(screen, sprite_list)
@@ -135,7 +135,7 @@ class Player:
         sprite = self._flip_sprite(sprite, self.flip_dir, False)
         player_rect = sprite.get_rect(center=player_center)
         screen.blit(sprite, player_rect)
-        self.debug_player(screen, self.player_collision)
+        # self.debug_player(screen, self.player_collision)
         self.hurt = False
 
     def _player_center_calculation(self):

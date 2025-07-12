@@ -90,7 +90,7 @@ class Suicide_Bomber:
             self.enemy_rect = rect  # Normal collision for enemy
 
         screen.blit(current_sprite, rect)
-        self.debug_enemy(screen, self.enemy_rect)
+        # self.debug_enemy(screen, self.enemy_rect)
 
     def _flip_sprite(self, sprite, direction):
         fliped = pygame.transform.flip(sprite,
@@ -112,7 +112,7 @@ class Suicide_Bomber:
         print('hurt')
         self.enemy_rect = sprite.get_rect(center=(self.x, self.y))
         screen.blit(sprite, self.enemy_rect)
-        self.debug_enemy(screen, self.enemy_rect)
+        # self.debug_enemy(screen, self.enemy_rect)
         self.moving = True
         self.hurt = False
 

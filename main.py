@@ -18,7 +18,7 @@ BACKGROUND_COLOR = (109, 105, 135)
 pygame.init()
 pygame.mixer.init()
 # Sets the number of simultaneous sound channels for the mixer.
-pygame.mixer.set_num_channels(32)
+pygame.mixer.set_num_channels(100)
 # pygame.mouse.set_visible(False)  # Hide system cdursor
 # Creates the game window with the specified width and height.
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))

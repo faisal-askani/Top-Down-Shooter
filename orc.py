@@ -9,7 +9,7 @@ class Orc:
         self._on_player_body_entered = on_player_body_entered
         self._get_player_position = get_player_position
         self.flip_dir = 0
-        self.enemy_speed = 1
+        self.enemy_speed = 3
         self.enemy_size = (80, 115)
         self.enemy_walk = self._sprite_loader(path="assets/enemy/orc/walk/walk",
                                               length=4,
@@ -74,7 +74,7 @@ class Orc:
         self.enemy_rect = current_sprite.get_rect(center=(self.x, self.y))
 
         screen.blit(current_sprite, self.enemy_rect)
-        self.debug_enemy(screen, self.enemy_rect)
+        # self.debug_enemy(screen, self.enemy_rect)
 
     def _flip_sprite(self, sprite, direction):
         fliped = pygame.transform.flip(sprite,
@@ -96,7 +96,7 @@ class Orc:
         print('Orc hurt')
         self.enemy_rect = sprite.get_rect(center=(self.x, self.y))
         screen.blit(sprite, self.enemy_rect)
-        self.debug_enemy(screen, self.enemy_rect)
+        # self.debug_enemy(screen, self.enemy_rect)
         self.moving = True
         self.hurt = False
 

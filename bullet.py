@@ -105,7 +105,7 @@ class Bullet:
 
             # self._on_body_entered(bullet_collision, bullet)
             screen.blit(self.bullet_sprite, bullet_draw_rect)
-            self.debug_bullets(screen, bullet_collision_rect)
+            # self.debug_bullets(screen, bullet_collision_rect)
 
             if (bullet["start_x"] < 0 or
                 bullet["start_x"] > 1920 or

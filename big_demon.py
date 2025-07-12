@@ -92,7 +92,7 @@ class BigDemon:
                                            self.flip_dir)
         self.enemy_rect = current_sprite.get_rect(center=(self.x, self.y))
         screen.blit(current_sprite, self.enemy_rect)
-        self.debug_enemy(screen, self.enemy_rect)
+        # self.debug_enemy(screen, self.enemy_rect)
 
     def _flip_sprite(self, sprite, direction):
         fliped = pygame.transform.flip(sprite,
@@ -115,7 +115,7 @@ class BigDemon:
             print('hurt')
             self.enemy_rect = sprite.get_rect(center=(self.x, self.y))
             screen.blit(sprite, self.enemy_rect)
-            self.debug_enemy(screen, self.enemy_rect)
+            # self.debug_enemy(screen, self.enemy_rect)
             self.hurt = False
 
     def _check_death_animation_done(self, sprite_list):
