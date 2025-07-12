@@ -38,7 +38,7 @@ class BigDemon:
         # DemonFire related variables for RANDOM shoots
         # Define a range for random shoot intervals (e.g., between 2 and 7 seconds)
         self.min_shoot_interval = 2000  # 2 seconds
-        self.max_shoot_interval = 3000  # 5 seconds
+        self.max_shoot_interval = 7000  # 5 seconds
         # Initial random interval for the first shot
         self.shoot_interval = random.randint(self.min_shoot_interval,
                                              self.max_shoot_interval)

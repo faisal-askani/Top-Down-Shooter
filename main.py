@@ -1,5 +1,6 @@
 import pygame
 import random
+import math
 from player import Player
 from bullet import Bullet
 from big_demon import BigDemon
@@ -10,7 +11,7 @@ from orc import Orc
 # Size of your game window in pixels.
 SCREEN_WIDTH = 1920
 SCREEN_HEIGHT = 1080
-TITLE = "Shapatar Londa"
+TITLE = "Shapatar"
 BACKGROUND_COLOR = (109, 105, 135)
 
 # Initialize pygame modules(display, sound, input)
@@ -28,13 +29,13 @@ pygame.mixer.music.load("assets/audio/retro_future.mp3")
 pygame.mixer.music.set_volume(0.2)  # Volume: 0.0 to 1.0
 pygame.mixer.music.play(-1)  # -1 = loop forever
 # ------------------------------------------------------------------------------------------------
-num_big_demons = 4  # Number of Demons
-num_suicide_bombers = 4  # Number of Bombers
-num_orc = 4
-spawn_margin = 300  # How far outside the screen enemies can spawn
+num_big_demons = 10  # Number of Demons
+num_suicide_bombers = 10  # Number of Bombers
+num_orc = 10
+spawn_margin = 700 # How far outside the screen enemies can spawn
 
 
-# --- Function to get random off-screen position ---
+# -------------- Function to get random off-screen position -------------- 
 def get_random_offscreen_position(margin):
     side = random.choice(['top', 'bottom', 'left', 'right'])
 
@@ -54,11 +55,35 @@ def get_random_offscreen_position(margin):
     return rand_x, rand_y
 
 
-# --- spawn_enemies ---
+# ----------------------------- Spawn Enemies -----------------------------
 def spawn_enemies(enemy_class, num_of_enemies):
     enemies = []
+    # unique (x, y) positions
+    used_positions = set()
+    # minimum between spawned enemies
+    minimum_distance = 600
+
     for _ in range(num_of_enemies):
-        rand_x, rand_y = get_random_offscreen_position(spawn_margin)
+        position_found = False
+        while not position_found:
+            rand_x, rand_y = get_random_offscreen_position(spawn_margin)
+            new_position = (rand_x, rand_y)
+
+            if new_position in used_positions:
+                continue
+
+            # if position is too close existing position
+            too_close = False
+            for existing_x, existing_y in used_positions:
+                distance = math.hypot(rand_x - existing_x, rand_y - existing_y)
+                if distance < minimum_distance:
+                    too_close = True
+                    break
+
+            if not too_close:
+                used_positions.add(new_position)
+                position_found = True            # Mark as found to exit the loop
+
         enemies.append(enemy_class(rand_x, rand_y,
                                    player.get_center,
                                    player.on_player_body_entered))
@@ -119,6 +144,8 @@ def update_and_draw_orc():
     print("second wave: ", second_wave)
 
 # ------ Update and draw BigDemons and Independent DemonFire ------
+
+
 def update_and_draw_demon_and_fire():
     global first_wave, second_wave, third_wave, final_wave
     for demon in big_demons[:]:
