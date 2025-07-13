@@ -19,8 +19,7 @@ You control a lone survivor armed with a rifle. The player can:
 There are three distinct enemy types, each with unique behaviors:
 
 ### 1. 🟢 Little Orc
-- Fast-moving melee attacker.
-- Attacks in groups to overwhelm the player.
+- Fast-moving swarm attacker.
 
 ### 2. 🔥 Big Demon
 - Large and slow.
@@ -29,7 +28,7 @@ There are three distinct enemy types, each with unique behaviors:
 
 ### 3. 💣 Suicide Bomber
 - Sprints toward the player.
-- Explodes in close range, dealing massive **area-of-effect** damage.
+- Explodes in close range, dealing **massive** damage.
   
 ---
 
@@ -56,7 +55,7 @@ Follow these steps to get the game up and running on your local machine.
 First, clone the game's repository to your local machine using Git:
 
 ```bash
-git clone [https://github.com/faisal-askani/Top-Down-Shooter.git](https://github.com/faisal-askani/Top-Down-Shooter.git)
+git clone https://github.com/faisal-askani/Top-Down-Shooter.git
 cd Top-Down-Shooter
 ```
 
@@ -65,7 +64,6 @@ cd Top-Down-Shooter
 ```bash
 pip install uv
 ```
-
 
 ### 3. Create and Sync the Environment
   - Navigate into the cloned repository and set up a virtual environment using uv. This ensures all dependencies are isolated from your system's Python installation.
@@ -78,7 +76,6 @@ source .venv/bin/activate  # On Windows use: .venv\Scripts\activate
 ### 4. After activating the virtual environment, install the necessary game dependencies, including Pygame, and sync with requirements.txt.
 
 ```bash
-uv pip install pygame
 uv pip install -r requirements.txt
 ```
 
