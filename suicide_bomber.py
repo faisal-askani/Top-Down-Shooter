@@ -11,6 +11,7 @@ class Suicide_Bomber:
         self.flip_dir = 0
         self.enemy_speed = 3
         self.enemy_size = (176, 198)
+        self.explosion_size = (200, 200)
         self.enemy_walk = self._sprite_loader(path="assets/enemy/suicide_bomber/walk/walk",
                                               length=4,
                                               size=self.enemy_size)
@@ -23,7 +24,8 @@ class Suicide_Bomber:
                                               length=4,
                                               size=(400, 400))
         self.explosion_sound = pygame.mixer.Sound("assets/audio/explosion.mp3")
-        self.hurt_sound = pygame.mixer.Sound("assets/audio/bomber_hurt_sound.wav")
+        self.hurt_sound = pygame.mixer.Sound(
+            "assets/audio/bomber_hurt_sound.wav")
         self.moving = True
         self.death = False
         self.hurt = False
@@ -85,12 +87,12 @@ class Suicide_Bomber:
         rect = current_sprite.get_rect(center=(self.x, self.y))
 
         if blast:
-            self.enemy_rect = rect.copy().inflate(450, 450)  # Bigger collision for blast
+            self.enemy_rect = rect.copy().inflate(self.explosion_size)
         else:
             self.enemy_rect = rect  # Normal collision for enemy
 
         screen.blit(current_sprite, rect)
-        # self.debug_enemy(screen, self.enemy_rect)
+        self.debug_enemy(screen, self.enemy_rect)
 
     def _flip_sprite(self, sprite, direction):
         fliped = pygame.transform.flip(sprite,

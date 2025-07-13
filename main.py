@@ -1,5 +1,7 @@
 import pygame
 import random
+import sys
+import os
 import math
 from player import Player
 from bullet import Bullet
@@ -11,8 +13,9 @@ from orc import Orc
 # Size of your game window in pixels.
 SCREEN_WIDTH = 1920
 SCREEN_HEIGHT = 1080
+os.environ['SDL_VIDEO_CENTERED'] = '1'
 TITLE = "Shapatar"
-BACKGROUND_COLOR = (109, 105, 135)
+BACKGROUND_COLOR = (30, 119, 53)
 
 # Initialize pygame modules(display, sound, input)
 pygame.init()
@@ -26,16 +29,16 @@ screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption(title=TITLE)
 clock = pygame.time.Clock()
 pygame.mixer.music.load("assets/audio/retro_future.mp3")
-pygame.mixer.music.set_volume(0.2)  # Volume: 0.0 to 1.0
-pygame.mixer.music.play(-1)  # -1 = loop forever
+pygame.mixer.music.set_volume(0.3)  # Volume: 0.0 to 1.0
+pygame.mixer.music.play(-1)  # -d1 = loop forever
 # ------------------------------------------------------------------------------------------------
-num_big_demons = 10  # Number of Demons
-num_suicide_bombers = 10  # Number of Bombers
-num_orc = 10
-spawn_margin = 700 # How far outside the screen enemies can spawn
+num_orc = 2  # Number of Orcs
+num_big_demons = 2  # Number of Demons
+num_suicide_bombers = 2  # Number of Bombers
+spawn_margin = 700  # How far outside the screen enemies can spawn
 
 
-# -------------- Function to get random off-screen position -------------- 
+# -------------- Function to get random off-screen position --------------
 def get_random_offscreen_position(margin):
     side = random.choice(['top', 'bottom', 'left', 'right'])
 
@@ -90,9 +93,6 @@ def spawn_enemies(enemy_class, num_of_enemies):
     return enemies
 
 
-background_image = pygame.transform.scale(pygame.image.load("assets/environment/background2.png"),
-                                          (1920, 1080))
-
 # A combined list of all active enemies for player bullet collision checks
 all_enemies = []
 # List to hold all active DemonFire projectiles
@@ -141,11 +141,10 @@ def update_and_draw_orc():
     if not orcs:
         first_wave = False
         second_wave = True
-    print("second wave: ", second_wave)
+        print("second wave: ", second_wave)
+
 
 # ------ Update and draw BigDemons and Independent DemonFire ------
-
-
 def update_and_draw_demon_and_fire():
     global first_wave, second_wave, third_wave, final_wave
     for demon in big_demons[:]:
@@ -169,7 +168,7 @@ def update_and_draw_demon_and_fire():
     if not big_demons:
         second_wave = False
         third_wave = True
-    print("third wave: ", third_wave)
+        print("third wave: ", third_wave)
 
 
 def demon_fire_generation():
@@ -201,51 +200,151 @@ def update_and_draw_suicide_bomber():
         if bomber.death_animation_done:
             suicide_bombers.remove(bomber)
 
+# ----------------------------------------------------------------
 
-running = True
-while running:
-    # Poll for events
-    events = pygame.event.get()
-    for event in events:
-        # pygame.QUIT event means the user clicked X to close your window
-        if event.type == pygame.QUIT:
-            running = False
 
-    # Fill the screen with a color to wipe away anything from last frame
-    screen.fill(BACKGROUND_COLOR)
-    screen.blit(background_image, (0, 0))
-    ######################## RENDER YOUR GAME HERE ########################
+def game_over():
+    background_image = pygame.transform.scale(pygame.image.load("assets/environment/background2.png"),
+                                              (1920, 1080))
+    print("Intro Screen")
+    font_path = "assets/font/Early GameBoy.ttf"  # replace with actual filename
+    g_font = pygame.font.Font(font_path, 72)   # Larger font for "Game Over"
+    p_font = pygame.font.Font(font_path, 32)
+    # background = (255, 255, 255)
 
-    player.handle_input()
-    player.draw(screen)
+    blink_interval = 500  # milliseconds
+    last_blink_time = 0
+    show_text = True
 
-    # --- Update and populate all_enemies list for bullet collision ---
-    clear_and_append_enemies()
-    # Pass all active enemies to the player's bullet manager for collision checks
-    bullet.handle_input(screen)
-    bullet.draw(screen, all_enemies)
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.KEYDOWN:
+                main_menu()
 
-    # --------------------- Update and draw Ocrs ----------------------
-    if first_wave:
-        update_and_draw_orc()
+        # screen.fill(background)
+        screen.blit(background_image, (0, 0))
+        g_text_surface = g_font.render(
+            "Game Over", True, (255, 255, 255))
+        g_text_rect = g_text_surface.get_rect(center=(930, 540))
+        screen.blit(g_text_surface, g_text_rect)
 
-    # ------ Update and draw BigDemons and Independent DemonFire ------
-    if second_wave:
-        update_and_draw_demon_and_fire()
-    demon_fire_generation()
+        # Blink logic
+        current_time = pygame.time.get_ticks()
+        if current_time - last_blink_time >= blink_interval:
+            show_text = not show_text
+            last_blink_time = current_time
 
-    # ----------------- Update and draw SuicideBombers ----------------
-    if third_wave:
-        update_and_draw_suicide_bomber()
+        if show_text:
+            p_text_surface = p_font.render(
+                "Press any key to Restart", True, (255, 255, 255))
+            press_text_rect = p_text_surface.get_rect(center=(930, 650))
+            screen.blit(p_text_surface, press_text_rect)
 
-    # -----------------------------------------------------------------
+        pygame.display.update()
+        clock.tick(60)
 
-    #######################################################################
 
-    # flip() the display to put your work on screen
-    pygame.display.flip()
-    # limits FPS to 60
-    clock.tick(60)
+def play():
+    print("Play Screen")
+    background_image = pygame.transform.scale(pygame.image.load("assets/environment/background2.png"),
+                                              (1920, 1080))
 
-# Close the library and quit the screen
-pygame.quit()
+    running = True
+    while running:
+        # Poll for events
+        events = pygame.event.get()
+        for event in events:
+            # pygame.QUIT event means the user clicked X to close your window
+            if event.type == pygame.QUIT:
+                running = False
+
+        # Fill the screen with a color to wipe away anything from last frame
+        screen.fill(BACKGROUND_COLOR)
+        screen.blit(background_image, (0, 0))
+        ######################## RENDER YOUR GAME HERE ########################
+
+        player.handle_input()
+        player.draw(screen)
+
+        # --- Update and populate all_enemies list for bullet collision ---
+        clear_and_append_enemies()
+        # Pass all active enemies to the player's bullet manager for collision checks
+        bullet.handle_input(screen)
+        bullet.draw(screen, all_enemies)
+
+        # --------------------- Update and draw Ocrs ----------------------
+        if first_wave:
+            update_and_draw_orc()
+
+        # ------ Update and draw BigDemons and Independent DemonFire ------
+        if second_wave:
+            update_and_draw_demon_and_fire()
+        demon_fire_generation()
+
+        # ----------------- Update and draw SuicideBombers ----------------
+        if third_wave:
+            update_and_draw_suicide_bomber()
+
+        # --------------------------- Game Over ---------------------------
+        if player.death_animation_done:
+            if third_wave:
+                if not suicide_bombers:
+                    game_over()
+            else:
+                game_over()
+        #######################################################################
+
+        # flip() the display to put your work on screen
+        pygame.display.flip()
+        # limits FPS to 60
+        clock.tick(60)
+
+    # Close the library and quit the screen
+    pygame.quit()
+
+
+def main_menu():
+    print("Intro Screen")
+    font_path = "assets/font/Early GameBoy.ttf"  # replace with actual filename
+    font = pygame.font.Font(font_path, 18)
+    intro_image = pygame.transform.scale(pygame.image.load("assets/extras/monster_hunter_intro_red.png"),
+                                         (1920, 1080))
+    blink_interval = 500  # milliseconds
+    last_blink_time = 0
+    show_text = True
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.KEYDOWN:
+                play()
+
+        screen.blit(intro_image, (0, 0))
+
+        # Blink logic
+        current_time = pygame.time.get_ticks()
+        if current_time - last_blink_time >= blink_interval:
+            show_text = not show_text
+            last_blink_time = current_time
+
+        if show_text:
+            p_text_surface = font.render(
+                "Press any key to play", True, (255, 255, 255))
+            press_text_rect = p_text_surface.get_rect(center=(930, 1010))
+            screen.blit(p_text_surface, press_text_rect)
+
+        d_text_surface = font.render(
+            "Developer: Faisal Askani", True, (255, 255, 255))
+        d_text_rect = d_text_surface.get_rect(center=(930, 1050))
+        screen.blit(d_text_surface, d_text_rect)
+
+        pygame.display.update()
+        clock.tick(60)
+
+
+main_menu()

@@ -8,7 +8,6 @@ class DemonFire:
         self.y = start_y
         self.dir_x = dir_x
         self.dir_y = dir_y
-
         self.fire_speed = 3
         self.has_hit = False
 
