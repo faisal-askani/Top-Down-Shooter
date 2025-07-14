@@ -39,7 +39,6 @@ class BigDemon:
         # Define a range for random shoot intervals (e.g., between 2 and 7 seconds)
         self.min_shoot_interval = 2000  # 2 seconds
         self.max_shoot_interval = 7000  # 5 seconds
-        # Initial random interval for the first shot
         self.shoot_interval = random.randint(self.min_shoot_interval,
                                              self.max_shoot_interval)
         # Randomize initial last_shot_time to offset firing
@@ -121,8 +120,8 @@ class BigDemon:
     def _check_death_animation_done(self, sprite_list):
         frame_index = self.animation_count // self.frames_per_image
         if frame_index >= len(sprite_list) - 1:
-            print(self.death_animation_done, "death animation done")
             self.death_animation_done = True
+            print(self.death_animation_done, ": demon death animation done")
 
     def fire_projectile(self, player_position):
         # Only fire if not dead and not currently hurting/dying

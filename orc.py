@@ -103,8 +103,8 @@ class Orc:
     def _check_death_animation_done(self, sprite_list):
         frame_index = self.animation_count // self.frames_per_image
         if frame_index >= len(sprite_list) - 1:
-            print(self.death_animation_done, "death animation done")
             self.death_animation_done = True
+            print(self.death_animation_done, ": orc death animation done")
 
     def _chase_player(self):
         player_pos_x, player_pos_y = self._get_player_position()

@@ -10,8 +10,8 @@ class Player:
         self.player_size = (150, 150)
         self.flip_dir = 0
         self.collision_size = (90, 150)
-        self.player_center = None
-        self.gun_radian = None
+        self.player_center = (x, y)
+        self.gun_radian = (x, y)
         self.player_idle = self._sprite_loader(path="assets/player/idle/idle",
                                                length=6,
                                                size=self.player_size)
@@ -27,7 +27,8 @@ class Player:
                                               size=(92, 46))
         self.crosshair_sprite = self._sprite_loader(path="assets/extras/crosshair.png",
                                                     size=(100, 100))
-        self.hurt_sound = pygame.mixer.Sound("assets/audio/player_hurt_sound.wav")
+        self.hurt_sound = pygame.mixer.Sound(
+            "assets/audio/player_hurt_sound.wav")
         self.idle = True
         self.moving = False
         self.hurt = False
@@ -111,7 +112,7 @@ class Player:
         player_rect = current_sprite.get_rect(center=player_center)
 
         screen.blit(current_sprite, player_rect)
-        # self.debug_player(screen, self.player_collision)
+        self.debug_player(screen, self.player_collision)
 
     def _player_walk_anim(self, screen, sprite_list):
         self._blit_player_anim(screen, sprite_list)
@@ -125,8 +126,8 @@ class Player:
         frame_index = self.animation_count // self.frames_per_image
         print('frame: ', frame_index, " len of sprite: ", len(sprite_list))
         if frame_index >= len(sprite_list) - 1:
-            print(self.death_animation_done, "hit animation done")
             self.death_animation_done = True
+            print(self.death_animation_done, ": player death animation done")
 
     def _player_hurt_anim(self, screen, sprite):
         player_center = self._player_center_calculation()
@@ -135,7 +136,7 @@ class Player:
         sprite = self._flip_sprite(sprite, self.flip_dir, False)
         player_rect = sprite.get_rect(center=player_center)
         screen.blit(sprite, player_rect)
-        # self.debug_player(screen, self.player_collision)
+        self.debug_player(screen, self.player_collision)
         self.hurt = False
 
     def _player_center_calculation(self):
@@ -178,6 +179,7 @@ class Player:
 
     def on_player_body_entered(self, bomber=False):
         if bomber:
+            self.death = True
             self.hit_count = 10
         self._handle_player_hit()
 
